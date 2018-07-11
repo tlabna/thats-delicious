@@ -45,15 +45,16 @@ app.use(
   })
 )
 
-// // Passport JS is what we use to handle our logins
+// Passport JS is what we use to handle our logins
 app.use(passport.initialize())
 app.use(passport.session())
 
-// // The flash middleware let's us use req.flash('error', 'Shit!'), which will then pass that message to the next page the user requests
+// The flash middleware let's us use req.flash('error', 'Crap!'), which will then pass that message to the next page the user requests
 app.use(flash())
 
 // pass variables to our templates + all requests
 app.use((req, res, next) => {
+  // locals are all the variables we have available in a template
   res.locals.h = helpers
   res.locals.flashes = req.flash()
   res.locals.user = req.user || null
