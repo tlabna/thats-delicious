@@ -88,7 +88,7 @@ exports.updateStore = async (req, res) => {
 
   req.flash(
     'success',
-    `Successfully updated <strong>${store.name}</strong>. <a href="/stores/${
+    `Successfully updated <strong>${store.name}</strong>. <a href="/store/${
       store.slug
     }">View Store</a>`
   )
@@ -105,7 +105,12 @@ exports.getStoreBySlug = async (req, res, next) => {
 }
 
 exports.getStoresByTag = async (req, res) => {
-  const tags = await Store.getTagsList()
   const { tag } = req.params
-  res.render('tags', { tags, title: 'Tags', tag })
+  // tagQuery = specific tag or every single tag
+  const tagQuery = tag || { $exists: true }
+  const tagsPromise = Store.getTagsList()
+  const storesPromise = Store.find({ tags: tagQuery })
+  const [tags, stores] = await Promise.all([tagsPromise, storesPromise])
+
+  res.render('tags', { tags, title: 'Tags', tag, stores })
 }
