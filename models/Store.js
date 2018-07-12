@@ -35,6 +35,7 @@ const storeSchema = new mongoose.Schema({
       required: 'You must enter an address!',
     },
   },
+  photo: String,
 })
 
 // Things to do pre save
