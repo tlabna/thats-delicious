@@ -39,6 +39,10 @@ exports.editStore = async (req, res) => {
 }
 
 exports.updateStore = async (req, res) => {
+  // set location data to have type of point
+  // Why? When updating the defaults don't trigger in
+  req.body.location.type = 'Point'
+
   // find and update the store
   // findOneAndUpdate(q, data, options)
   const store = await Store.findOneAndUpdate({ _id: req.params.id }, req.body, {
