@@ -58,4 +58,16 @@ storeSchema.pre('save', async function(next) {
   next()
 })
 
+storeSchema.statics.getTagsList = function() {
+  // 1. unwind - get each instance of tag (for multiple tags in one instance)
+  // it'll return multiple instances of the same object but with each tag
+  // 2. group all instances by id: tag + add count prop and add 1 each time for same tag
+  // 3. sort in descending order
+  return this.aggregate([
+    { $unwind: '$tags' },
+    { $group: { _id: '$tags', count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+  ])
+}
+
 module.exports = mongoose.model('Store', storeSchema)
