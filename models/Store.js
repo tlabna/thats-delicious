@@ -39,15 +39,23 @@ const storeSchema = new mongoose.Schema({
 })
 
 // Things to do pre save
-storeSchema.pre('save', function(next) {
+storeSchema.pre('save', async function(next) {
   if (!this.isModified('name')) {
     next() // skip
     return // stop function from running
   }
   this.slug = slug(this.name)
-  next()
 
-  // TODO: make more resilient so slugs are unique
+  // find other stores that have the same slug and make sure they are unique
+  const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i')
+  // this.constructor = Store -> So we can access Store in model itself
+  const storesWithSlug = await this.constructor.find({ slug: slugRegEx })
+  // if slug exists and others with - then edit slug with incremented number after -
+  if (storesWithSlug.length) {
+    this.slug = `${this.slug}-${storesWithSlug.length + 1}`
+  }
+
+  next()
 })
 
 module.exports = mongoose.model('Store', storeSchema)
