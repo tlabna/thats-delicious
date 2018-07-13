@@ -15,7 +15,9 @@ const {
   loginForm,
   registerForm,
   validateRegister,
+  register,
 } = require('../controllers/userController')
+const { login } = require('../controllers/authController')
 const { catchErrors } = require('../handlers/errorHandlers')
 
 router.get('/', catchErrors(getStores))
@@ -33,6 +35,6 @@ router.get('/register', registerForm)
 // 1. Validate the registration data
 // 2. Register the user
 // 3. Login user
-router.post('/register', validateRegister)
+router.post('/register', validateRegister, register, login)
 
 module.exports = router
