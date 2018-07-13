@@ -11,6 +11,11 @@ const {
   getStoreBySlug,
   getStoresByTag,
 } = require('../controllers/storeController')
+const {
+  loginForm,
+  registerForm,
+  validateRegister,
+} = require('../controllers/userController')
 const { catchErrors } = require('../handlers/errorHandlers')
 
 router.get('/', catchErrors(getStores))
@@ -22,5 +27,12 @@ router.get('/stores/:id/edit', catchErrors(editStore))
 router.get('/store/:slug', catchErrors(getStoreBySlug))
 router.get('/tags', catchErrors(getStoresByTag))
 router.get('/tags/:tag', catchErrors(getStoresByTag))
+router.get('/login', loginForm)
+router.get('/register', registerForm)
+
+// 1. Validate the registration data
+// 2. Register the user
+// 3. Login user
+router.post('/register', validateRegister)
 
 module.exports = router
