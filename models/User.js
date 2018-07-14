@@ -20,6 +20,8 @@ const userSchema = new Schema({
     required: 'Please enter a name',
     trim: true,
   },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 })
 
 // virtual field
