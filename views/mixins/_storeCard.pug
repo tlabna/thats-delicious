@@ -2,9 +2,12 @@ mixin storeCard(store = {})
   .store
     .store__hero
       .store__actions
-        .store__action.store__action--edit
-          a(href=`/stores/${store._id}/edit`)
-            != h.icon('pencil')
+        //- Display edit button for logged in store owner
+        //- 1. A logged in User & 2. Owner of the store
+        if user && store.author.equals(user._id)
+          .store__action.store__action--edit
+            a(href=`/stores/${store._id}/edit`)
+              != h.icon('pencil')
       img(src=`/uploads/${store.photo || 'store.png'}`, alt=`${store.slug}`)
       h2.title
         a(href=`/store/${store.slug}`) #{store.name}

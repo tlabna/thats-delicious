@@ -49,7 +49,14 @@ exports.addStore = (req, res) => {
   res.render('editStore', { title: 'Add Store' })
 }
 
+/**
+ * Creates a Store from user submitted data in store form.
+ *
+ * @param {Object} req Request object
+ * @param {Object} res Response Object
+ */
 exports.createStore = async (req, res) => {
+  req.body.author = req.user._id // Add logged in user (id) to author
   const store = await new Store(req.body).save()
   req.flash(
     'success',
@@ -65,11 +72,25 @@ exports.getStores = async (req, res) => {
   res.render('stores', { title: 'Stores', stores })
 }
 
+/**
+ * Checks if user is owner of the store
+ *
+ * @param {Object} store Store object
+ * @param {Object} user User object
+ */
+const confirmOwner = (store, user) => {
+  if (!store.author.equals(user._id)) {
+    throw Error('You must own a store in order to edit it.')
+  }
+}
+
 exports.editStore = async (req, res) => {
   // 1. Find the store given an ID
   const store = await Store.findOne({ _id: req.params.id })
+
   // 2. Confirm they are the owner of the store
-  // TODO
+  confirmOwner(store, req.user)
+
   // 3. Render out the edit form so the user can update their store
   res.render('editStore', { title: `Edit ${store.name}`, store })
 }
@@ -96,9 +117,21 @@ exports.updateStore = async (req, res) => {
   res.redirect(`/stores/${store._id}/edit`)
 }
 
+/**
+ * Queries DB for store by slug and renders store page if it exists
+ *
+ * @param {Object} req Request object
+ * @param {Object} res Response object
+ * @param {Function} next Next middleware function
+ * @returns Renders store view or calls next middleware function
+ */
 exports.getStoreBySlug = async (req, res, next) => {
   // 1. Find the store by slug
-  const store = await Store.findOne({ slug: req.params.slug })
+  // populate the author field with user data
+  const store = await Store.findOne({ slug: req.params.slug }).populate(
+    'author'
+  )
+
   // 2. render out the store layout
   if (!store) return next()
   res.render('store', { store, title: store.title })
