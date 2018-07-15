@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const User = mongoose.model('User')
 const crypto = require('crypto') // built in node.js module to provide creating hash
 const promisify = require('es6-promisify')
+const mail = require('../handlers/mail')
 
 exports.login = passport.authenticate('local', {
   failureRedirect: '/login',
@@ -33,12 +34,12 @@ exports.isLoggedIn = (req, res, next) => {
 /**
  * Sends user a password reset link.
  * If user exists, a password reset link is sent with an expiry limit (1hr)
- * and redirected to /login.
+ * and then user is redirected to /login.
  * Note. If user does not exist, they will receive the same message that a link
  * has been sent. (for security and privacy reasons)
- * (Currently: reset link is displayed in flash message -> TODO: send by email)
- * @param {Object} req request object
- * @param {Object} res response object
+ *
+ * @param {Object} req Request object
+ * @param {Object} res Response object
  */
 exports.forgot = async (req, res) => {
   // 1. Check if user exists
@@ -48,15 +49,24 @@ exports.forgot = async (req, res) => {
     req.flash('info', 'A password reset has been mailed to you.')
     return res.redirect('/login')
   }
+
   // 2. Set reset token and expiry on user account
   user.resetPasswordToken = crypto.randomBytes(20).toString('hex')
   user.resetPasswordExpires = Date.now() + 3600000 // 1 hour from now
   await user.save()
+
   // 3. Send user an email with the token
   const resetUrl = `http://${req.headers.host}/account/reset/${
     user.resetPasswordToken
   }`
-  req.flash('success', `A password reset has been mailed to you. ${resetUrl}`)
+  await mail.send({
+    user,
+    subject: 'Password Reset',
+    resetUrl,
+    filename: 'password-reset', // when we render html, we'll look for password-reset.pug file
+  })
+  req.flash('success', 'A password reset has been mailed to you.')
+
   // 4. redirect to login page
   res.redirect('/login')
 }
@@ -64,8 +74,9 @@ exports.forgot = async (req, res) => {
 /**
  * Displays reset form to user (if reset link is valid)
  * i.e. resetPasswordToken matches and is within resetPasswordExpires time
- * @param {Object} req request object
- * @param {Object} res response object
+ *
+ * @param {Object} req Request object
+ * @param {Object} res Response object
  */
 exports.reset = async (req, res) => {
   // Find user by token in URL param (supplied in reset link)
@@ -86,7 +97,8 @@ exports.reset = async (req, res) => {
 }
 
 /**
- *  Checks that both user submitted passwords match
+ * Checks that both user submitted passwords match
+ *
  * @param {Object} req request object
  * @param {Object} res response object
  * @param {Function} next calls the next middleware
@@ -104,6 +116,7 @@ exports.confirmedPasswords = (req, res, next) => {
 
 /**
  * Updates user submitted password from user reset link.
+ *
  * @param {Object} req request object
  * @param {Object} res response object
  */
