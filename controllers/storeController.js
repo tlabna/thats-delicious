@@ -200,7 +200,17 @@ exports.mapStores = async (req, res) => {
   }
   // .select(specifies which document fields to include)
   const stores = await Store.find(q)
-    .select('slug name description location')
+    .select('slug name description location photo')
     .limit(10)
   res.json(stores)
+}
+
+/**
+ * Renders map view
+ *
+ * @param {Object} req Request Object
+ * @param {Object} res Response Object
+ */
+exports.mapPage = (req, res) => {
+  res.render('map', { title: 'Map' })
 }

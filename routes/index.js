@@ -12,6 +12,7 @@ const {
   getStoresByTag,
   searchStores,
   mapStores,
+  mapPage,
 } = require('../controllers/storeController')
 const {
   loginForm,
@@ -71,6 +72,9 @@ router.post(
   confirmedPasswords,
   catchErrors(updatePassword)
 )
+
+/* /map */
+router.get('/map', mapPage)
 
 /* API Endpoints */
 router.get('/api/search/', catchErrors(searchStores))

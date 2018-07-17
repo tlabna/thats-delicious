@@ -25,7 +25,7 @@ function searchResultsHTML(stores) {
  * - Displays results to user or message with none found
  * - Handles keyboard inputs to allow user to use keyboard instead of mouse
  *
- * @param {DOM Element} search Search box DOM element
+ * @param {NodeElement} search Search box DOM element
  */
 function typeAhead(search) {
   if (!search) {
