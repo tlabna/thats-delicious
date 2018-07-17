@@ -176,3 +176,31 @@ exports.searchStores = async (req, res) => {
 
   res.json(stores)
 }
+
+/**
+ * Returns JSON response of stores within 10km radius from query lat/lng
+ * - Fields returns = slug, name, description and location
+ * - Limited to 10 stores per request
+ *
+ * @param {Object} req Request object
+ * @param {Object} res Response object
+ */
+exports.mapStores = async (req, res) => {
+  const coordinates = [req.query.lng, req.query.lat].map(parseFloat)
+  const q = {
+    location: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates,
+        },
+        $maxDistance: 10000, // 10km
+      },
+    },
+  }
+  // .select(specifies which document fields to include)
+  const stores = await Store.find(q)
+    .select('slug name description location')
+    .limit(10)
+  res.json(stores)
+}

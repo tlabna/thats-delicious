@@ -11,6 +11,7 @@ const {
   getStoreBySlug,
   getStoresByTag,
   searchStores,
+  mapStores,
 } = require('../controllers/storeController')
 const {
   loginForm,
@@ -73,5 +74,6 @@ router.post(
 
 /* API Endpoints */
 router.get('/api/search/', catchErrors(searchStores))
+router.get('/api/stores/near', catchErrors(mapStores))
 
 module.exports = router

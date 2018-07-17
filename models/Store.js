@@ -49,6 +49,10 @@ storeSchema.index({
   description: 'text',
 })
 
+storeSchema.index({
+  location: '2dsphere', // Create a geo-spatial index for location
+})
+
 // Things to do pre save
 storeSchema.pre('save', async function(next) {
   if (!this.isModified('name')) {
