@@ -10,6 +10,7 @@ const {
   resize,
   getStoreBySlug,
   getStoresByTag,
+  searchStores,
 } = require('../controllers/storeController')
 const {
   loginForm,
@@ -69,5 +70,8 @@ router.post(
   confirmedPasswords,
   catchErrors(updatePassword)
 )
+
+/* API Endpoints */
+router.get('/api/search/', catchErrors(searchStores))
 
 module.exports = router

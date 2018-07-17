@@ -147,3 +147,32 @@ exports.getStoresByTag = async (req, res) => {
 
   res.render('tags', { tags, title: 'Tags', tag, stores })
 }
+
+/**
+ * Returns JSON response of stores matching query q
+ * (ex. /api/search?q=coffee)
+ *
+ * @param {Object} req Request object
+ * @param {Object} res Response object
+ */
+exports.searchStores = async (req, res) => {
+  const stores = await Store.find(
+    // first find stores that match
+    {
+      $text: {
+        $search: req.query.q,
+      },
+    },
+    {
+      // project (i.e. add) a score field with number of times we find the query
+      // text in store object. This way we can order query by textScore
+      score: { $meta: 'textScore' },
+    }
+  )
+    // then sort in descending order
+    .sort({ score: { $meta: 'textScore' } })
+    // limit to only 5 store
+    .limit(5)
+
+  res.json(stores)
+}
