@@ -33,6 +33,7 @@ const {
   confirmedPasswords,
   updatePassword,
 } = require('../controllers/authController')
+const { addReview } = require('../controllers/reviewController')
 const { catchErrors } = require('../handlers/errorHandlers')
 
 /** index route */
@@ -42,6 +43,7 @@ router.get('/', catchErrors(getStores))
 router.get('/stores', catchErrors(getStores))
 router.get('/stores/:id/edit', catchErrors(editStore))
 router.get('/store/:slug', catchErrors(getStoreBySlug))
+router.post('/reviews/:id', isLoggedIn, catchErrors(addReview))
 
 /** /add */
 router.get('/add', isLoggedIn, addStore)
