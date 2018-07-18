@@ -20,34 +20,36 @@ const mapOptions = {
  * @param {number} [lng=-79.8] Longitude coordinate
  */
 function loadPlaces(map, lat = 43.2, lng = -79.8) {
-  axios.get(`/api/stores/near?lat=${lat}&lng=${lng}`).then((res) => {
-    const places = res.data
-    if (!places.length) {
-      alert('no places found!')
-      return
-    }
+  axios
+    .get(`/api/stores/near?lat=${lat}&lng=${lng}`)
+    .then((res) => {
+      const places = res.data
+      if (!places.length) {
+        alert('no places found!')
+        return
+      }
 
-    // create bounds
-    const bounds = new google.maps.LatLngBounds()
+      // create bounds
+      const bounds = new google.maps.LatLngBounds()
 
-    // info window
-    const infoWindow = new google.maps.InfoWindow()
+      // info window
+      const infoWindow = new google.maps.InfoWindow()
 
-    // markers
-    const markers = places.map((place) => {
-      const [placeLng, placeLat] = place.location.coordinates
-      const position = { lat: placeLat, lng: placeLng }
-      bounds.extend(position)
-      const marker = new google.maps.Marker({ map, position })
-      marker.place = place
-      return marker
-    })
+      // markers
+      const markers = places.map((place) => {
+        const [placeLng, placeLat] = place.location.coordinates
+        const position = { lat: placeLat, lng: placeLng }
+        bounds.extend(position)
+        const marker = new google.maps.Marker({ map, position })
+        marker.place = place
+        return marker
+      })
 
-    // when someone clicks on a marker, show details of that place
-    markers.forEach((marker) =>
-      marker.addListener('click', function() {
-        const { slug, name, photo, location } = this.place
-        const html = `
+      // when someone clicks on a marker, show details of that place
+      markers.forEach((marker) =>
+        marker.addListener('click', function() {
+          const { slug, name, photo, location } = this.place
+          const html = `
           <div class="popup">
             <a href="/store/${slug}">
               <img src="/uploads/${photo || 'store.png'}" alt="${name}" />
@@ -56,15 +58,16 @@ function loadPlaces(map, lat = 43.2, lng = -79.8) {
           </div>
         `
 
-        infoWindow.setContent(html)
-        infoWindow.open(map, this)
-      })
-    )
+          infoWindow.setContent(html)
+          infoWindow.open(map, this)
+        })
+      )
 
-    // zoom the map to fit all markers perfectly
-    map.setCenter(bounds.getCenter())
-    map.fitBounds(bounds)
-  })
+      // zoom the map to fit all markers perfectly
+      map.setCenter(bounds.getCenter())
+      map.fitBounds(bounds)
+    })
+    .catch(console.error)
 }
 
 /**
