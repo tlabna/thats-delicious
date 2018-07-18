@@ -14,6 +14,7 @@ const {
   mapStores,
   mapPage,
   heartStore,
+  getHearts,
 } = require('../controllers/storeController')
 const {
   loginForm,
@@ -76,6 +77,9 @@ router.post(
 
 /* /map */
 router.get('/map', mapPage)
+
+/* /hearts */
+router.get('/hearts', isLoggedIn, catchErrors(getHearts))
 
 /* API Endpoints */
 router.get('/api/search/', catchErrors(searchStores))

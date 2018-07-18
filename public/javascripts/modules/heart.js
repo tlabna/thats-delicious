@@ -12,7 +12,6 @@ import { $ } from './bling'
 function ajaxHeart(e) {
   // prevent form from refreshing and changing page
   e.preventDefault()
-  console.log('heart it!!!!')
 
   axios
     .post(this.action)
