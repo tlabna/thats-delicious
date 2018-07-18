@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Store = mongoose.model('Store')
+const User = mongoose.model('User')
 const multer = require('multer')
 const jimp = require('jimp')
 const uuid = require('uuid')
@@ -213,4 +214,31 @@ exports.mapStores = async (req, res) => {
  */
 exports.mapPage = (req, res) => {
   res.render('map', { title: 'Map' })
+}
+
+/**
+ * Returns JSON response of User object with updated User hearts from a POST request.
+ * - URL: POST -> /api/stores/:id/hearts
+ * - Toggles between:
+ *  1. Adding store ID to user hearts set (if store hasn't been hearted)
+ *  2. Removing store ID from user hearts set (if store has been hearted before)
+ *
+ * @param {Object} req Request Object
+ * @param {Object} res Response Object
+ */
+exports.heartStore = async (req, res) => {
+  // Get list of user hearts
+  const hearts = req.user.hearts.map((obj) => obj.toString())
+
+  // Check if store has been hearted by user. True then remove else add to set
+  const operator = hearts.includes(req.params.id) ? '$pull' : '$addToSet'
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      [operator]: { hearts: req.params.id },
+    },
+    { new: true } // Will tell mongoDB to return the updated user, !(initial query result)
+  )
+
+  res.json(user)
 }

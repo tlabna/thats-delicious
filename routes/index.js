@@ -13,6 +13,7 @@ const {
   searchStores,
   mapStores,
   mapPage,
+  heartStore,
 } = require('../controllers/storeController')
 const {
   loginForm,
@@ -79,5 +80,6 @@ router.get('/map', mapPage)
 /* API Endpoints */
 router.get('/api/search/', catchErrors(searchStores))
 router.get('/api/stores/near', catchErrors(mapStores))
+router.post('/api/stores/:id/heart', catchErrors(heartStore))
 
 module.exports = router
