@@ -3,45 +3,55 @@ const slug = require('slugs')
 
 mongoose.Promise = global.Promise
 
-const storeSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: 'Please enter a store name!',
-  },
-  slug: String,
-  description: {
-    type: String,
-    trim: true,
-  },
-  tags: [String],
-  created: {
-    type: Date,
-    default: Date.now,
-  },
-  location: {
-    type: {
+const storeSchema = new mongoose.Schema(
+  {
+    name: {
       type: String,
-      default: 'Point',
+      trim: true,
+      required: 'Please enter a store name!',
     },
-    coordinates: [
-      {
-        type: Number,
-        required: 'You must supply coordinates!',
+    slug: String,
+    description: {
+      type: String,
+      trim: true,
+    },
+    tags: [String],
+    created: {
+      type: Date,
+      default: Date.now,
+    },
+    location: {
+      type: {
+        type: String,
+        default: 'Point',
       },
-    ],
-    address: {
-      type: String,
-      required: 'You must enter an address!',
+      coordinates: [
+        {
+          type: Number,
+          required: 'You must supply coordinates!',
+        },
+      ],
+      address: {
+        type: String,
+        required: 'You must enter an address!',
+      },
+    },
+    photo: String,
+    author: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: 'You must supply an author',
     },
   },
-  photo: String,
-  author: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: 'You must supply an author',
-  },
-})
+  // We add this option because by default virtual fields are not included when
+  // asking for object or JSON of instance. It's there but you don't see it
+  // You can either explicitly ask for it -> ex. store.reviews
+  // Or add the option below, so when we ask for Object or JSON they will be included
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+)
 
 // Define our indexes
 storeSchema.index({
@@ -84,5 +94,12 @@ storeSchema.statics.getTagsList = function() {
     { $sort: { count: -1 } },
   ])
 }
+
+// Find reviews where the stores _id property === reviews store property
+storeSchema.virtual('reviews', {
+  ref: 'Review', // Model to reference (i.e link)
+  localField: '_id', // Field on the Store model
+  foreignField: 'store', // Field on the Review model
+})
 
 module.exports = mongoose.model('Store', storeSchema)

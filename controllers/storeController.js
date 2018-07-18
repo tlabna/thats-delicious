@@ -129,8 +129,9 @@ exports.updateStore = async (req, res) => {
 exports.getStoreBySlug = async (req, res, next) => {
   // 1. Find the store by slug
   // populate the author field with user data
+  // populate the reviews virtual field with review data
   const store = await Store.findOne({ slug: req.params.slug }).populate(
-    'author'
+    'author reviews'
   )
 
   // 2. render out the store layout
