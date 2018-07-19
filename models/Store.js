@@ -95,11 +95,65 @@ storeSchema.statics.getTagsList = function() {
   ])
 }
 
+/**
+ * Returns top instances of stores by reviews (at least 2 or more reviews)
+ * - Queries reviews with relationship store _id === review.store
+ * - Only returns instances with 2 or more reviews
+ * - Adds averageRating property to instance -> average of reviews rating
+ * - Sorts by averageRating in descending order
+ * - Limits to 10 instances (stores) at most
+ *
+ * @returns Top instances of stores by average rating of reviews in descending order
+ */
+storeSchema.statics.getTopStores = function() {
+  // aggregate is lower level mongoDB and not mongoose so can't use virtual fields
+  return this.aggregate([
+    // Lookup Stores and populate their reviews
+    // from: 'reviews' is from mongoDB it will lowercase model name and add an s in the end
+    {
+      $lookup: {
+        from: 'reviews',
+        localField: '_id',
+        foreignField: 'store',
+        as: 'reviews',
+      },
+    },
+    // Filter for only items that have 2 or more reviews
+    // 'reviews.1' = second item in reviews exists -> .1 is index (starts at 0)
+    { $match: { 'reviews.1': { $exists: true } } },
+    // Add the average reviews field
+    {
+      $addFields: {
+        // $ means data being piped in (i.e from $match in this case)
+        averageRating: { $avg: '$reviews.rating' },
+      },
+    },
+    // sort it by our new field, highest reviews first
+    { $sort: { averageRating: -1 } },
+    // limit to at most 10
+    { $limit: 10 },
+  ])
+}
+
 // Find reviews where the stores _id property === reviews store property
 storeSchema.virtual('reviews', {
   ref: 'Review', // Model to reference (i.e link)
   localField: '_id', // Field on the Store model
   foreignField: 'store', // Field on the Review model
 })
+
+/**
+ * Auto populates reviews field when store is queried
+ *
+ * @param {Function} next Calls next middleware
+ */
+function autoPopulate(next) {
+  this.populate('reviews')
+  next()
+}
+
+// Add hooks to run autoPopulate() when we querying using find or findOne
+storeSchema.pre('find', autoPopulate)
+storeSchema.pre('findOne', autoPopulate)
 
 module.exports = mongoose.model('Store', storeSchema)
