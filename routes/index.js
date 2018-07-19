@@ -66,7 +66,7 @@ router.get('/register', registerForm)
 // 1. Validate the registration data
 // 2. Register the user
 // 3. Login user
-router.post('/register', validateRegister, register, login)
+router.post('/register', validateRegister, catchErrors(register), login)
 
 /** /account */
 router.get('/account', isLoggedIn, account)
