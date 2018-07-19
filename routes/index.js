@@ -42,6 +42,7 @@ router.get('/', catchErrors(getStores))
 
 /** /stores and /store */
 router.get('/stores', catchErrors(getStores))
+router.get('/stores/page/:page', catchErrors(getStores))
 router.get('/stores/:id/edit', catchErrors(editStore))
 router.get('/store/:slug', catchErrors(getStoreBySlug))
 router.post('/reviews/:id', isLoggedIn, catchErrors(addReview))

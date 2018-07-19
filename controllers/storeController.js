@@ -66,11 +66,56 @@ exports.createStore = async (req, res) => {
   res.redirect(`/store/${store.slug}`)
 }
 
+/**
+ * Renders stores template view
+ * - Queries db for stores, returns stores depending on constraints of limit and skip
+ * - stores query is sorted by created timestamp in descending order
+ * - limit = # of stores to return, skip = skip stores from start of list of stores
+ * - counts total number of stores in db
+ * - protects route if a page does not exists
+ *
+ * @param {Object} req Request object
+ * @param {Object} res Response object
+ */
 exports.getStores = async (req, res) => {
-  // 1. Query the database for a list of all stores
-  const stores = await Store.find()
+  // Get page number or 1 for homepage
+  const page = req.params.page || 1
 
-  res.render('stores', { title: 'Stores', stores })
+  // Max number of stores per page
+  const limit = 4
+
+  // Skips the number of store from start (ex. page 2 we skip 4 (first 4 stores))
+  const skip = page * limit - limit
+
+  // 1. Query the database for a list of all stores
+  const storesPromise = Store.find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ created: 'desc' }) // sort by created timestamp in descending order
+
+  // 2. Count the total number of documents (instances) of Store
+  const countPromise = Store.count()
+
+  // Launch both promises and await
+  const [stores, count] = await Promise.all([storesPromise, countPromise])
+
+  // get upper bound of # of pages
+  const pages = Math.ceil(count / limit)
+
+  // Protect route if pages change
+  // (i.e. user bookmarked page 20 but that doesn't exists anymore)
+  if (!stores.length && skip) {
+    req.flash(
+      'info',
+      `You asked for page ${page}, however, that doesn't exist anymore...
+      So I've redirected you to page ${pages}`
+    )
+
+    res.redirect(`/stores/page/${pages}`)
+    return
+  }
+
+  res.render('stores', { title: 'Stores', stores, page, pages, count })
 }
 
 /**
