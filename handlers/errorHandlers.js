@@ -44,7 +44,7 @@ exports.flashValidationErrors = (err, req, res, next) => {
  * Detect if there are passport-local-mongoose validation errors that we can show via flash messages
  */
 exports.passportUserValidationErrors = (err, req, res, next) => {
-  if (!err.name === 'UserExistsError') return next(err)
+  if (err.name !== 'UserExistsError') return next(err)
 
   req.flash('error', err.message)
   res.redirect('back')
