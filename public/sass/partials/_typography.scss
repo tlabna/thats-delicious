@@ -76,3 +76,16 @@ p {
   font-size: 10rem;
   text-align: center;
 }
+
+// Reduce font-size for store titles on smaller devices
+@media all and (max-width: 500px) {
+  .title--single {
+    font-size: 8rem;
+  }
+}
+
+@media all and (max-width: 375px) {
+  .title--single {
+    font-size: 6rem;
+  }
+}

@@ -1,6 +1,7 @@
 .pagination {
   display: flex;
   align-items: center;
+  justify-content: center;
   background: white;
   margin-top: 2rem;
   margin-bottom: 2rem;
@@ -10,7 +11,7 @@
     padding: 1rem 3rem 1rem 1rem;
     a:after {
       margin-left: 1rem;
-      content: '→'
+      content: "→";
     }
   }
   &__prev {
@@ -18,12 +19,30 @@
     padding: 1rem 1rem 1rem 3rem;
     a:before {
       margin-right: 1rem;
-      content: '←'
+      content: "←";
     }
   }
   &__text {
     flex: 3 0 auto;
     padding: 1rem;
     text-align: center;
+  }
+}
+
+// Turn pagination to column orientation on smaller devices
+@media all and (max-width: 400px) {
+  .pagination {
+    flex-direction: column;
+    text-align: center;
+    &__next {
+      width: 100%;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 1rem 0;
+    }
+    &__prev {
+      width: 100%;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 1rem 0;
+    }
   }
 }

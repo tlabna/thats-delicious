@@ -125,3 +125,12 @@
     margin-right: 1rem;
   }
 }
+
+// reduce font size for nav pages links
+@media all and (max-width: 325px) {
+  .nav {
+    &__section--pages {
+      font-size: 1rem;
+    }
+  }
+}

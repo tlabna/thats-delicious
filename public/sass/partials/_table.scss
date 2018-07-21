@@ -14,3 +14,10 @@
     color: white;
   }
 }
+
+@media all and (max-width: 375px) {
+  // Only smaller screen sizes hide the reviews column
+  tr > td:nth-child(4) {
+    display: none;
+  }
+}
