@@ -82,7 +82,7 @@ exports.getStores = async (req, res) => {
   const page = req.params.page || 1
 
   // Max number of stores per page
-  const limit = 4
+  const limit = 6
 
   // Skips the number of store from start (ex. page 2 we skip 4 (first 4 stores))
   const skip = page * limit - limit
